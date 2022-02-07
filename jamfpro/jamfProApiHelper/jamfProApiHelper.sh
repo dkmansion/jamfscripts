@@ -26,7 +26,7 @@ logFilePath="${BASH_SOURCE[0]}.log"
 # - Refreshing auth tokens as they near expiration/Clearing them when done.
 # - Error messages relevant to the Jamf Pro API
 # - Demonstrate how to parse out data elements
-# - Convert child object data (e.g. lists of computer IDs) to itterable arrays
+# - Convert child object data (e.g. lists of computer IDs) to iterable arrays
 # - Extract data from json via XPath. (Consider using jq instead.)
 
 # Tip, (not used here...) you can register top level script so we can terminate it from 
@@ -380,43 +380,43 @@ echo
 # ############################## YOUR SCIPT ##############################
 # API EXAMPLES...
 
-# 
-# echo "Example 1. Getting Jamf Pro Version"
-# callJamfProAPI -- endpoint "/JSSCheckConnection"
-# echo "API call status is $(checkApiException 200)"  # returns "ok" or an error message
-# writeMessageToFileAndStdout "The Jamf Pro version is \"${apiResponse}\"$'n"
-# # writeBlankLineToFile; echo ''
-# 
-# 
-# echo "Example 2. How many computers are there?"
-# callJamfProAPI "/JSSResource/computers"
-# echo "API call status is $(checkApiException 200)"
-# computerCount=$(getXmlValue "${apiResponse}" '/computers/size')  # <computers><size>118
-# echo "There are ${computerCount} computers in Jamf Pro"
+
+echo "Example 1. Getting Jamf Pro Version"
+callJamfProAPI --endpoint "/JSSCheckConnection"
+echo "API call status is $(checkApiException 200)"  # returns "ok" or an error message
+writeMessageToFileAndStdout "The Jamf Pro version is \"${apiResponse}\"$'n"
 # writeBlankLineToFile; echo ''
-# 
-# 
-# echo "Example 3. Getting a list of all computer IDs"
-# # Re-using ${apiResponse} from example 2...
-# idList=$(getXmlValue "${apiResponse}" '//computers/computer/id')
-# echo "$idList"
-# while IFS= read -r id; do
-#   echo "${id}"
-# done <<< "${idList}"
-# writeBlankLineToFile; echo ''
-# 
-# 
-# echo "Example 4. Getting a list of all computer Names, array method"
-# # The above works fine for things like IDs, but if the data could contain 
-# # bash IFS delimiters like spaces and newlines, parse the data to an array.
-# # (Reusing $apiResponse from example 2, but parsing it differently than example 3.)
-# getXmlValues "${apiResponse}" '//computers/computer/name'
-# # getXmlValues puts its answers in $xmlItemArray
-# for item in "${xmlItemArray[@]}"; do
-#   echo "$item"
-# done
-# writeBlankLineToFile; echo ''
-# 
+
+
+echo "Example 2. How many computers are there?"
+callJamfProAPI --endpoint "/JSSResource/computers"
+echo "API call status is $(checkApiException 200)"
+computerCount=$(getXmlValue "${apiResponse}" '/computers/size')  # <computers><size>118
+echo "There are ${computerCount} computers in Jamf Pro"
+writeBlankLineToFile; echo ''
+
+
+echo "Example 3. Getting a list of all computer IDs"
+# Re-using ${apiResponse} from example 2...
+idList=$(getXmlValue "${apiResponse}" '//computers/computer/id')
+echo "$idList"
+while IFS= read -r id; do
+  echo "${id}"
+done <<< "${idList}"
+writeBlankLineToFile; echo ''
+
+
+echo "Example 4. Getting a list of all computer Names, array method"
+# The above works fine for things like IDs, but if the data could contain 
+# bash IFS delimiters like spaces and newlines, parse the data to an array.
+# (Reusing $apiResponse from example 2, but parsing it differently than example 3.)
+getXmlValues "${apiResponse}" '//computers/computer/name'
+# getXmlValues puts its answers in $xmlItemArray
+for item in "${xmlItemArray[@]}"; do
+  echo "$item"
+done
+writeBlankLineToFile; echo ''
+
 
 echo "Example 5. Handling pagination..."
 # The Jamf Pro API introduces the concept of pagination. That's a big help
@@ -534,7 +534,7 @@ until [[ $nextPage -gt $lastPage ]]; do
   
   # Here is a _much_ easier way to do it using plistbuddy... 
   # plist array elements are zero-based so we start at 0
-  for (( i = 0; i < $pageRecordCount; i++ )); do
+  for (( i = 0; i < pageRecordCount; i++ )); do
     echo "Processing page $thisPage : computer $i of $pageRecordCount"    
     # Example of using plistbuddy to read plist data items, in this case, computer names...
     /usr/libexec/PlistBuddy -c "print :results:$i:general:name" /dev/stdin <<< "$plist"
